@@ -1,0 +1,542 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+
+namespace QuizApplication
+{
+    public partial class Quiz : Form
+    {
+
+        public int userScoreTotal = 0;
+        public int nextQuestion = 0;
+        string QuestionsFilePath = AppDomain.CurrentDomain.BaseDirectory + @"\" + "questions.txt";
+        public string CorrectAnswer;
+        public string topic;
+        public string level;
+        public String path = AppDomain.CurrentDomain.BaseDirectory;
+        string currentQuestion;
+        int click = 0;
+
+        public Quiz()
+        {
+            InitializeComponent();
+        }
+
+        private void Quiz_Load(object sender, EventArgs e)
+        {
+
+            var fn = File.Create(path + "wronganswers.html");
+            fn.Close();
+
+            using (StreamWriter w = File.AppendText(path + "wronganswers.html"))
+            {
+                w.WriteLine("<title>QuizApp Performance Review</title>");
+                w.WriteLine("<h1><center>QuizApp Performance Review</center></h1>");
+                w.Close();
+            }
+
+            checkBox1.Visible = false;
+            checkBox2.Visible = false;
+            checkBox3.Visible = false;
+            checkBox4.Visible = false;
+
+            if (topic == "Maths" && level == "Easy")
+            {
+                nextQuestion = 0;
+            }
+
+            if (topic == "Maths" && level == "Medium")
+            {
+                nextQuestion = 36;
+            }
+
+            if (topic == "Maths" && level == "Hard")
+            {
+                nextQuestion = 72;
+            }
+
+            if (topic == "Physics" && level == "Easy")
+            {
+                nextQuestion = 108;
+            }
+
+            if (topic == "Physics" && level == "Medium")
+            {
+                nextQuestion = 150;
+            }
+
+            if (topic == "Physics" && level == "Hard")
+            {
+                nextQuestion = 192;
+            }
+
+            if (topic == "Computer Science" && level == "Easy")
+            {
+                nextQuestion = 234;
+            }
+
+            if (topic == "Computer Science" && level == "Medium")
+            {
+                nextQuestion = 276;
+            }
+
+            if (topic == "Computer Science" && level == "Hard")
+            {
+                nextQuestion = 318;
+            }
+
+            if (topic == "Biology" && level == "Easy")
+            {
+                nextQuestion = 353;
+            }
+
+            if (topic == "Biology" && level == "Medium")
+            {
+                nextQuestion = 395;
+            }
+
+            if (topic == "Biology" && level == "Hard")
+            {
+                nextQuestion = 430;
+            }
+
+            if (topic == "Chemistry" && level == "Easy")
+            {
+                nextQuestion = 479;
+            }
+
+            if (topic == "Chemistry" && level == "Medium")
+            {
+                nextQuestion = 514;
+            }
+
+            if (topic == "Chemistry" && level == "Hard")
+            {
+                nextQuestion = 556;
+            }
+        }
+
+        private void submitbtn_Click(object sender, EventArgs e)
+        {
+            click++;
+
+            checkBox1.Visible = true;
+            checkBox2.Visible = true;
+            checkBox3.Visible = true;     
+            checkBox4.Visible = true;
+
+            //when the user presses the 'next' button, do this:
+
+            if (checkBox1.Checked && checkBox1.Text == CorrectAnswer) //if checkbox 1 is selected and it is the CORRECT ANSWER
+            {
+                userScoreTotal++; //add 1 to the user score!
+                correctAnswers.Text = "Your score: " + userScoreTotal.ToString(); //show the score
+            }
+
+            else if (checkBox2.Checked && checkBox2.Text == CorrectAnswer) //if checkbox 2 is selected and it is the CORRECT ANSWER
+            {
+                userScoreTotal++; //add 1 to the user score!
+                correctAnswers.Text = "Your score: " + userScoreTotal.ToString(); //show the score
+            }
+
+            else if (checkBox3.Checked && checkBox3.Text == CorrectAnswer) //if checkbox 3 is selected and it is the CORRECT ANSWER
+            {
+                userScoreTotal++; //add 1 to the user score!
+                correctAnswers.Text = "Your score: " + userScoreTotal.ToString(); //show the score
+            }
+
+            else if (checkBox4.Checked && checkBox4.Text == CorrectAnswer) //if checkbox 4 is selected and it is the CORRECT ANSWER
+            {
+                userScoreTotal++; //add 1 to the user score!
+                correctAnswers.Text = "Your score: " + userScoreTotal.ToString(); //show the score
+            }
+
+            if (click > 1 && !checkBox1.Checked && !checkBox2.Checked && !checkBox3.Checked && !checkBox4.Checked)
+            {
+                MessageBox.Show("You must give an answer!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (Control c in this.Controls)
+            {
+                if (c is CheckBox && ((CheckBox)c).Checked && c.Text != CorrectAnswer)
+                {
+                    using (StreamWriter w = File.AppendText(path + "wronganswers.html"))
+                    {                        
+                        informationGiver ig = new informationGiver();
+                        ig.info(currentQuestion);
+
+                        w.WriteLine("<br><br><p><font size = '5'>" + "The question was: " + currentQuestion +
+                        "<br>You incorrectly answered as follows: " + c.Text + "<br>" + ig.customText +
+                        "</font>");
+                        w.Close();
+                    }
+                }
+            }
+            
+            QuestionNext();
+
+        }
+
+        private void updateUserScore()
+        {
+            UserSettings.userTotal += userScoreTotal;
+
+            string line1;
+            string line2;
+            string line3;
+            string line4;
+
+            StreamReader reader = new StreamReader(path + @"\users\" + UserSettings.userID + ".txt");
+            {
+
+                line1 = reader.ReadLine(); //first name
+                line2 = reader.ReadLine(); //last name
+                line3 = reader.ReadLine(); //password
+                line4 = reader.ReadLine(); //admin
+                reader.ReadLine(); //user score
+                reader.Close();
+
+            }
+
+
+            StreamWriter writer = new StreamWriter(path + @"\users\" + UserSettings.userID + ".txt");
+            {
+                writer.WriteLine(line1);
+                writer.WriteLine(line2);
+                writer.WriteLine(line3);
+                writer.WriteLine(line4);
+                writer.WriteLine(UserSettings.userTotal);
+                writer.Close();
+
+            }
+
+            this.Close();
+           
+        }
+
+        private void QuestionNext()
+        {
+
+            if (topic == "Maths" && level == "Easy" && nextQuestion == 36)
+            {
+                DialogResult btnresult =  
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+                updateUserScore();
+            }
+
+            if (topic == "Maths" && level == "Medium" && nextQuestion == 72)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+                updateUserScore();
+            }
+
+            if (topic == "Maths" && level == "Hard" && nextQuestion == 108)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Physics" && level == "Easy" && nextQuestion == 150)
+            {
+                DialogResult btnresult =
+                     MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                     + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Physics" && level == "Medium" && nextQuestion == 192)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Physics" && level == "Hard" && nextQuestion == 234)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Computer Science" && level == "Easy" && nextQuestion == 276)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Computer Science" && level == "Medium" && nextQuestion == 318)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Computer Science" && level == "Hard" && nextQuestion == 353)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Biology" && level == "Easy" && nextQuestion == 395)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Biology" && level == "Medium" && nextQuestion == 430)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Biology" && level == "Hard" && nextQuestion == 479)
+            {
+                DialogResult btnresult =
+                     MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                     + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Chemistry" && level == "Easy" && nextQuestion == 514)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Chemistry" && level == "Medium" && nextQuestion == 556)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+
+                updateUserScore();
+            }
+
+            if (topic == "Chemistry" && level == "Hard" && nextQuestion == 592)
+            {
+                DialogResult btnresult =
+                    MessageBox.Show("You have completed the quiz! Your score is: " + userScoreTotal.ToString()
+                    + ". Do you want to review your incorrect answers?", "Quiz Complete!", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (btnresult == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(path + "wronganswers.html");
+                }
+
+                updateUserScore();
+            }
+
+
+            //uncheck all checkboxes first!
+            checkBox1.Checked = false;
+            checkBox2.Checked = false;
+            checkBox3.Checked = false;
+            checkBox4.Checked = false;
+
+
+            //now read the question.txt file
+            questionLabel.Text = File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First(); //makes nextQuestion = 1, so it reads the first line
+            currentQuestion = questionLabel.Text;
+
+            //first answer is always the right one!
+            CorrectAnswer = File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First();//makes nextQuestion = 2, so it reads the second line, and so on
+            string answer2 = File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First();
+            string answer3 = File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First();
+            string answer4 = File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First();
+            File.ReadLines(QuestionsFilePath).Skip(nextQuestion++).Take(1).First(); //the fourth line is always blank in the txt file, so skip it
+
+            Random rnd = new Random();
+            int randomNo = rnd.Next(1, 4);   // let's create a random number between 1 and 4
+            randomNo = Convert.ToInt32(randomNo); //convert the random number to an int
+
+            switch (randomNo)
+            {
+                case 1: //if our random number = 1 etc..
+                    checkBox1.Text = CorrectAnswer;
+                    checkBox2.Text = answer2;
+                    checkBox3.Text = answer3;
+                    checkBox4.Text = answer4;
+                    break;
+                case 2: 
+                    checkBox1.Text = answer3;
+                    checkBox2.Text = answer4;
+                    checkBox3.Text = CorrectAnswer;
+                    checkBox4.Text = answer2;
+                    break;
+                case 3:
+                    checkBox1.Text = answer2;
+                    checkBox2.Text = CorrectAnswer;
+                    checkBox3.Text = answer4;
+                    checkBox4.Text = answer3;
+                    break;
+                case 4:
+                    checkBox1.Text = answer4;
+                    checkBox2.Text = answer3;
+                    checkBox3.Text = answer2;
+                    checkBox4.Text = CorrectAnswer;
+                    break;
+            }
+        }
+
+        private void checkBox1_MouseClick(object sender, MouseEventArgs e)
+        {
+            checkBox4.Checked = false;
+            checkBox3.Checked = false;
+            checkBox2.Checked = false;
+            checkBox1.Checked = true;
+        }
+
+        private void checkBox2_MouseClick(object sender, MouseEventArgs e)
+        {
+            checkBox4.Checked = false;
+            checkBox3.Checked = false;
+            checkBox2.Checked = true;
+            checkBox1.Checked = false;
+
+        }
+
+        private void checkBox3_MouseClick(object sender, MouseEventArgs e)
+        {
+            checkBox4.Checked = false;
+            checkBox3.Checked = true;
+            checkBox2.Checked = false;
+            checkBox1.Checked = false;
+        }
+
+        private void checkBox4_MouseClick(object sender, MouseEventArgs e)
+        {
+            checkBox3.Checked = false;
+            checkBox2.Checked = false;
+            checkBox1.Checked = false;
+            checkBox4.Checked = true;
+        }
+
+        private void Quiz_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            startgamescreen sg = new startgamescreen();
+            sg.Show();
+            
+        }
+    }
+}

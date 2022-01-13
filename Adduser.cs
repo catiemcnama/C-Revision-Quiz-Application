@@ -25,27 +25,6 @@ namespace QuizApplication
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-         
-        }
-
-        private void browsebtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Adduser_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void pictureBox2_Click(object sender, EventArgs e)
         {
 
@@ -116,14 +95,5 @@ namespace QuizApplication
             this.Hide();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Username_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
